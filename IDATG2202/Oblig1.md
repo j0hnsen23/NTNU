@@ -75,4 +75,45 @@ main(int argc, char *argv[])
 
 ### Oppgave 5 - Kapittel 3 ( (OBLIG-1) Skriv et C-program som kjører seks prosesser etter følgende tidsplan (S betyr start, T betyr terminate/avslutt):)
 
+```c
+  #include <stdio.h>     /* printf */
+  #include <stdlib.h>    /* exit */
+  #include <unistd.h>    /* fork */
+  #include <sys/wait.h>  /* waitpid */
+  #include <sys/types.h> /* pid_t */
+  /* Note: pid_t is probably just an int, but it might be different
+     kind of ints on different platforms, so using pid_t instead of
+     int helps makes the code more platform-independent 
+  */
+
+  void process(int number, int time) {
+    printf("Process %d is running\n", number);
+    sleep(time);
+    printf("Prosess %d ran for %d seconds\n", number, time);
+  }
+
+int start[6] = {0,1,0,3,1,4}
+int duration[6] = {1,2,3,2,3,3}
+
+int main(){
+	pid_t pids[6];
+
+	for(int i = 0; i < 6; i++){
+		pids[i] = fork();
+		if(pids[i] == 0){
+			sleep(start[i]);
+			process(i,duration[i]);
+			exit(0);
+	}
+}
+
+for(int i = 0; i < 6; i++){
+	waitpid(pids[i],NULL,0);
+}
+
+printf("Alle prosesser er ferdige.\n);
+return 0;
+}
+```
+
 ### Oppgave 6 - Kapittel 4 ((OBLIG-1) MLFQ har følgende regler)
