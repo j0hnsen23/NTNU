@@ -36,8 +36,7 @@ int main(int argc, char *argv[])
     char *navn = argv[1];
     char *alder = argv[2];
 
-    printf("Navn: %s\n", navn);
-    printf("Alder: %s\n", alder);
+    printf("Yo, Im %s and Im at least %s years old\n", navn, alder);
 
     return 0;
 }
