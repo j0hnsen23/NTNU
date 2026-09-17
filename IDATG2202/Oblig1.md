@@ -116,3 +116,42 @@ return 0;
 ```
 
 ### Oppgave 6 - Kapittel 4 ((OBLIG-1) MLFQ har følgende regler)
+- 1) Når P0 er ferdig, forlater den kø:
+	- Frekvensen er lavere enn timeslice så forlater aldri kø 3
+- 2) Når P1 er ferdig, forlater den kø:
+	- Den forlater kø 3, ettersom den fikk priority boost
+- 3) Når P2 er ferdig, forlater den kø:
+	- Q0, den får boost ved t=50 så ved t=60 rykker ned til Q2, ved t=65 rykker ned til Q1, ved Q70 rykker ned til Q0
+- 4) Hvilken kø ligger P0 i på tidspunkt 15?
+ - Q3 fordi den går aldri ned fra Q3
+- 5) Turnaround time for P1 (ms):
+	- Turnaround time = Sluttid - Ankomstid = 60-0 = 60ms
+- 6) Gjennomsnittlig turnaround time (ms):
+	- p0 = 34-0 = 34ms
+   	- p1 = 60-0 = 60ms
+   	- p2 = 80-0 = 80ms
+   	- Gjennomsnittlig turnaround tid = 58 ms
+- 7) Response time for P2 (ms):
+	- 9 - se tabell
+- 8) Gjennomsnittlig response time (ms):
+	- p0 = 1
+  	- p1 = 4
+  	- p2 = 9
+  	- 14/3 = 4.67 ms
+- 9) Er CPU-en opptatt hele tiden, eller står den idle en periode?
+	- Ja den er opptatt hele tiden fra 0-80ms, alltid en prosess i køen.
+- 10) På tidspunkt 20 ankommer en ny prosess P3 med kjøretid 10 og uten I/O. Hva blir gjennomsnittlig turnaround time og gjennomsnittlig response time nå?
+  - Turnaround time:
+  - p0 = 36ms
+  - p1 = 70ms
+  - p2 = 90ms
+  - p3 = 45-20 = 25ms
+  - total = 221
+  - gjn = 55.25ms
+ 
+  - Response time:
+  - p0 = 1ms
+  - p1 = 4ms
+  - p2 = 9ms
+  - p3 = 23-20 = 3 ms
+  - gjn = 4.25ms
