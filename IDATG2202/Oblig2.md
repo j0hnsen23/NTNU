@@ -164,3 +164,129 @@ int main(void){
 ```
 
 - Programmet krasjer. NULL er adresse 0, og den er ikke mappet inn i prosessens adresserom. Når programmet prøver å lese derfra gir maskinvaren en feil og OS-et avslutter prosessen med en segmentation fault.
+
+
+## Oppgave 6 
+### Kapittel 6, Oppgave 11
+     Top-level              Second-level
+     +-----+---+            +-----+---+
+1023 |  -  | 0 |       1023 |  g  | 1 |
+   .                      .
+   .                      .
+   .                      .
+  10 |  -  | 0 |         10 |  -  | 0 |
+   9 |  A  | 1 |          9 |  -  | 0 |         
+   8 |  E  | 1 |          8 |  s  | 1 |
+   7 |  -  | 0 |          7 |  -  | 0 |
+   6 |  -  | 0 |          6 |  b  | 1 |
+   5 |  -  | 0 |          5 |  c  | 1 |  
+   4 |  P  | 1 |          4 |  r  | 1 |
+   3 |  -  | 0 |          3 |  k  | 1 |  
+   2 |  C  | 1 |          2 |  -  | 0 | 
+   1 |  F  | 1 |          1 |  -  | 0 |  
+   0 |  M  | 1 |          0 |  a  | 1 |
+     +-----+---+            +-----+---+
+
+Offset: Page størrelse er 4KB = 2^12 byte så 12 bit offset
+Sidenummer = 32-12 = 20 bit til sidenummeret
+Tabellene har 1024 oppføringer, og 1024 = 2¹⁰, så 10 bit til hvert nivå. 10 - Top level | 10 - Second level
+
+1) Store bokstaver (top level) - rammenummeret (adressen) til en andre-nivå page table
+2) Små bokstaver (second level) - (PTE-er) rammenummeret til siden i det fysiske minnet
+3) Biten til høyre - present-bit
+
+4)  0000001001 | 0000000110 | 110110111010
+    9            6            110110111010
+    A            b            110110111010
+
+    A (present-bit 1) peker på andre-nivå-tabellen. Der gir indeks 6 rammenummeret b (present-bit 1). Offset kopieres uendret.
+    
+    Den fysiske adressen blir b | 1101 1011 1010
+
+
+
+## Oppgave 7
+### Kapittel 6, Oppgave 12
+Arrayen: a[0] - a[2999]
+Page størrelse: 4KB -> 4096 byte
+En int: 4 byte
+
+1) 4096 / 4 = 1024 int-er
+2) 3000 / 1024 = 2.929 ≈ 3 pager
+3) 3000-3 = 2997 , hit rate = 2997/3000 * 100 = 99.9% (En miss hver gang en ny page brukes og resten av oppslagene blir hits(Arrayen dekker 3 pager og får dermed kun 3 misser)).
+4) TLB-en lagrer en oversettelse per page, ikke per element. Etter første oppslag ligger oversettelsen i TLB-en, så resten av elementene i samme page blir hits. Siden programmene ligger etter hverandre så bruker man romslig lokalitet.
+
+
+## Oppgave 8
+### Kapittel 6, Oppgave 13
+En prosess gjør oppslag i denne rekkefølgen med pages: 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5
+
+1)
+- FIFO og 3 page frames: 9 PAGE FAULTS
+1 // PAGE FAULT
+2 // PAGE FAULT
+3 // PAGE FAULT
+4 // PAGE FAULT - Kaster 1 ut
+1 // PAGE FAULT - Kaster 2 ut
+2 // PAGE FAULT - Kaster 3 ut
+5 // PAGE FAULT - Kaster 4 ut
+1 // Allerede i page frame
+2 // Allerede i page frame
+3 // PAGE FAULT - Kaster 1 ut
+4 // PAGE FAULT - Kaster 2 ut
+5 // Allerede i page frame
+
+2)
+- LRU og 3 page frames: 10 PAGE FAULTS
+1 // PAGE FAULT
+2 // PAGE FAULT
+3 // PAGE FAULT
+4 // PAGE FAULT - Kaster ut 1
+1 // PAGE FAULT - Kaster ut 2
+2 // PAGE FAULT - Kaster ut 3
+5 // PAGE FAULT - Kaster ut 4
+1 // Allerede i page frame
+2 // Allerede i page frame
+3 // PAGE FAULT - Kaster ut 5
+4 // PAGE FAULT - Kaster ut 1
+5 // PAGE FAULT - Kaster ut 2
+
+3)
+- optimal og 3 page frames: 7 PAGE FAULTS
+1 // PAGE FAULT
+2 // PAGE FAULT
+3 // PAGE FAULT
+4 // PAGE FAULT - Kaster ut 3 (Lengst i fremtiden)
+1 // Allerede i page frame
+2 // Allerede i page frame
+5 // PAGE FAULT - Kaster ut 4 (Lengst i fremtiden)
+1 // Allerede i page frame
+2 // Allerede i page frame
+3 // PAGE FAULT - Kaster ut 1 (Kunne brukt 2, lengst i fremtiden)
+4 // PAGE FAULT - Kaster ut 2 (Kunne brukt 3, lengst i fremtiden)
+5 // Allerede i page frame
+  
+4)
+- FIFO og 4 page frames: 10 PAGE FAULTS
+1 // PAGE FAULT
+2 // PAGE FAULT
+3 // PAGE FAULT
+4 // PAGE FAULT
+1 // Allerede i page frame
+2 // Allerede i page frame
+5 // PAGE FAULT - Kaster ut 1
+1 // PAGE FAULT - Kaster ut 2
+2 // PAGE FAULT - Kaster ut 3
+3 // PAGE FAULT - Kaster ut 4
+4 // PAGE FAULT - Kaster ut 5
+5 // PAGE FAULT - Kaster ut 1
+
+Kalles Belady's Anomaly
+
+
+## Oppgave 9
+### Kapittel 6, Oppgave 14
+1) 0.99 * 100 + 0.01 * 200 = 99 + 2 = 101 ns fordi den må kjøre ett ekstra minne oppslag.
+2) 10^-6 * 10 ms = 10^-6 * 10 000 000 ns = 10ns -> Nytt gjennomsnitt = 111ns
+3) 10 ms = 10 000 000 ns (10 000 000ns / 1ns = 10 000 000 oppslag) -> Man kan høyst ha omtrent en major page fault per 10 millioner oppslag.
+4) Fordi en major page fault koster ca 100 000 ganger mer enn et vanlig minneoppslag, så skal det svært få faults til før de tar mesteparten av kjøretiden. Når maskinen swapper skjer page faults ofte, og prosessoren bruker nesten all tiden på å vente på disk. Derfor føles det ut som om maskinen har stoppet opp helt.
