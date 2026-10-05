@@ -223,63 +223,63 @@ En prosess gjør oppslag i denne rekkefølgen med pages: 1, 2, 3, 4, 1, 2, 5, 1,
 
 1)
 - FIFO og 3 page frames: 9 PAGE FAULTS
-1 // PAGE FAULT
-2 // PAGE FAULT
-3 // PAGE FAULT
-4 // PAGE FAULT - Kaster 1 ut
-1 // PAGE FAULT - Kaster 2 ut
-2 // PAGE FAULT - Kaster 3 ut
-5 // PAGE FAULT - Kaster 4 ut
-1 // Allerede i page frame
-2 // Allerede i page frame
-3 // PAGE FAULT - Kaster 1 ut
-4 // PAGE FAULT - Kaster 2 ut
-5 // Allerede i page frame
+- 1 // PAGE FAULT
+- 2 // PAGE FAULT
+- 3 // PAGE FAULT
+- 4 // PAGE FAULT - Kaster 1 ut
+- 1 // PAGE FAULT - Kaster 2 ut
+- 2 // PAGE FAULT - Kaster 3 ut
+- 5 // PAGE FAULT - Kaster 4 ut
+- 1 // Allerede i page frame
+- 2 // Allerede i page frame
+- 3 // PAGE FAULT - Kaster 1 ut
+- 4 // PAGE FAULT - Kaster 2 ut
+- 5 // Allerede i page frame
 
 2)
 - LRU og 3 page frames: 10 PAGE FAULTS
-1 // PAGE FAULT
-2 // PAGE FAULT
-3 // PAGE FAULT
-4 // PAGE FAULT - Kaster ut 1
-1 // PAGE FAULT - Kaster ut 2
-2 // PAGE FAULT - Kaster ut 3
-5 // PAGE FAULT - Kaster ut 4
-1 // Allerede i page frame
-2 // Allerede i page frame
-3 // PAGE FAULT - Kaster ut 5
-4 // PAGE FAULT - Kaster ut 1
-5 // PAGE FAULT - Kaster ut 2
+- 1 // PAGE FAULT
+- 2 // PAGE FAULT
+- 3 // PAGE FAULT
+- 4 // PAGE FAULT - Kaster ut 1
+- 1 // PAGE FAULT - Kaster ut 2
+- 2 // PAGE FAULT - Kaster ut 3
+- 5 // PAGE FAULT - Kaster ut 4
+- 1 // Allerede i page frame
+- 2 // Allerede i page frame
+- 3 // PAGE FAULT - Kaster ut 5
+- 4 // PAGE FAULT - Kaster ut 1
+- 5 // PAGE FAULT - Kaster ut 2
 
 3)
 - optimal og 3 page frames: 7 PAGE FAULTS
-1 // PAGE FAULT
-2 // PAGE FAULT
-3 // PAGE FAULT
-4 // PAGE FAULT - Kaster ut 3 (Lengst i fremtiden)
-1 // Allerede i page frame
-2 // Allerede i page frame
-5 // PAGE FAULT - Kaster ut 4 (Lengst i fremtiden)
-1 // Allerede i page frame
-2 // Allerede i page frame
-3 // PAGE FAULT - Kaster ut 1 (Kunne brukt 2, lengst i fremtiden)
-4 // PAGE FAULT - Kaster ut 2 (Kunne brukt 3, lengst i fremtiden)
-5 // Allerede i page frame
+- 1 // PAGE FAULT
+- 2 // PAGE FAULT
+- 3 // PAGE FAULT
+- 4 // PAGE FAULT - Kaster ut 3 (Lengst i fremtiden)
+- 1 // Allerede i page frame
+- 2 // Allerede i page frame
+- 5 // PAGE FAULT - Kaster ut 4 (Lengst i fremtiden)
+- 1 // Allerede i page frame
+- 2 // Allerede i page frame
+- 3 // PAGE FAULT - Kaster ut 1 (Kunne brukt 2, lengst i fremtiden)
+- 4// PAGE FAULT - Kaster ut 2 (Kunne brukt 3, lengst i fremtiden)
+- 5 // Allerede i page frame
   
 4)
 - FIFO og 4 page frames: 10 PAGE FAULTS
-1 // PAGE FAULT
-2 // PAGE FAULT
-3 // PAGE FAULT
-4 // PAGE FAULT
-1 // Allerede i page frame
-2 // Allerede i page frame
-5 // PAGE FAULT - Kaster ut 1
-1 // PAGE FAULT - Kaster ut 2
-2 // PAGE FAULT - Kaster ut 3
-3 // PAGE FAULT - Kaster ut 4
-4 // PAGE FAULT - Kaster ut 5
-5 // PAGE FAULT - Kaster ut 1
+- 1 // PAGE FAULT
+- 2 // PAGE FAULT
+- 3 // PAGE FAULT
+- 4 // PAGE FAULT
+- 1 // Allerede i page frame
+- 2 // Allerede i page frame
+- 5 // PAGE FAULT - Kaster ut 1
+- 1 // PAGE FAULT - Kaster ut 2
+- 2 // PAGE FAULT - Kaster ut 3
+- 3 // PAGE FAULT - Kaster ut 4
+- 4 // PAGE FAULT - Kaster ut 5
+- 5 // PAGE FAULT - Kaster ut 1
 
 Kalles Belady's Anomaly
 
