@@ -168,24 +168,7 @@ int main(void){
 
 ## Oppgave 6 
 ### Kapittel 6, Oppgave 11
-     Top-level              Second-level
-     +-----+---+            +-----+---+
-1023 |  -  | 0 |       1023 |  g  | 1 |
-   .                      .
-   .                      .
-   .                      .
-  10 |  -  | 0 |         10 |  -  | 0 |
-   9 |  A  | 1 |          9 |  -  | 0 |         
-   8 |  E  | 1 |          8 |  s  | 1 |
-   7 |  -  | 0 |          7 |  -  | 0 |
-   6 |  -  | 0 |          6 |  b  | 1 |
-   5 |  -  | 0 |          5 |  c  | 1 |  
-   4 |  P  | 1 |          4 |  r  | 1 |
-   3 |  -  | 0 |          3 |  k  | 1 |  
-   2 |  C  | 1 |          2 |  -  | 0 | 
-   1 |  F  | 1 |          1 |  -  | 0 |  
-   0 |  M  | 1 |          0 |  a  | 1 |
-     +-----+---+            +-----+---+
+<img width="245" height="194" alt="Oppgave6" src="https://github.com/user-attachments/assets/d7ab6b3a-92b4-4e7c-b52d-74b8fcbfc42a" />
 
 Offset: Page størrelse er 4KB = 2^12 byte så 12 bit offset
 Sidenummer = 32-12 = 20 bit til sidenummeret
