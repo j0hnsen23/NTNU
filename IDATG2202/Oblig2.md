@@ -162,6 +162,16 @@ int main(void){
   return 0;
 }
 ```
+1. *i ber CPU om å lese 4 byte fra virtuell adresse 0
+2. MMU deler adresse: VPN=0 Offset=0
+3. OS har page 0 umappet, present bit = 0 (For å fange NULL pekere)
+4. MMU kan ikke oversette -> utløser exception -> OS tar over.
+5. OS ser at adressen ikke hører til et gyldig område i prossessen (Ulovlig adresse)
+6. OS sender SIGSEGV -> prosessen avsluttes.
+(exit status til forrige kommando)
+gir 139 = 128 + 11
+Bash legger til 128
+Segfault = SIGSEGV = 11
 
 - Programmet krasjer. NULL er adresse 0, og den er ikke mappet inn i prosessens adresserom. Når programmet prøver å lese derfra gir maskinvaren en feil og OS-et avslutter prosessen med en segmentation fault.
 
@@ -174,8 +184,8 @@ Offset: Page størrelse er 4KB = 2^12 byte så 12 bit offset
 Sidenummer = 32-12 = 20 bit til sidenummeret
 Tabellene har 1024 oppføringer, og 1024 = 2¹⁰, så 10 bit til hvert nivå. 10 - Top level | 10 - Second level
 
-1) Store bokstaver (top level) - rammenummeret (adressen) til en andre-nivå page table
-2) Små bokstaver (second level) - (PTE-er) rammenummeret til siden i det fysiske minnet
+1) Store bokstaver (top level) - rammenummeret (PFN) til en andre-nivå page table
+2) Små bokstaver (second level) - PFN til page-framen der dataene ligger
 3) Biten til høyre - present-bit
 
 4)  0000001001 | 0000000110 | 110110111010
