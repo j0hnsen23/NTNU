@@ -148,7 +148,7 @@ int main(void){
 ```
 
 - Rekkefølge? global og static ligger lavest (data), så kommer malloc(heap) og local ligger høyest(stack). Det er slikt minne er bygget opp.
-- Like adresser? Nei, de endrer seg hver gang fordi OS-et flytter ting tilfeldig (ASLR). Rekkefølgen er likevel alltid den samme.
+- Like adresser? Nei, de endrer seg hver gang fordi OS-et flytter ting tilfeldig. Rekkefølgen er likevel alltid den samme.
 
 ## Oppgave 5
 ### Kapittel 5, Oppgave 14
