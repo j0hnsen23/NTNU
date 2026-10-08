@@ -174,6 +174,7 @@ Bash legger til 128
 Segfault = SIGSEGV = 11
 
 - Programmet krasjer. NULL er adresse 0, og den er ikke mappet inn i prosessens adresserom. Når programmet prøver å lese derfra gir maskinvaren en feil og OS-et avslutter prosessen med en segmentation fault.
+- En segfault er når et program prøver å bruke minne det ikke har lov til, enten en adresse som ikke er mappet, eller en tilgang som ikke er tillatt. Operativsystemet stopper da programmet.
 
 
 ## Oppgave 6 
