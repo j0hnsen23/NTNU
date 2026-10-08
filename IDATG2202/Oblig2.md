@@ -215,7 +215,7 @@ En int: 4 byte
 En prosess gjør oppslag i denne rekkefølgen med pages: 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5
 
 1)
-- FIFO og 3 page frames: 9 PAGE FAULTS
+- FIFO (First in First Out) og 3 page frames: 9 PAGE FAULTS
 - 1 // PAGE FAULT
 - 2 // PAGE FAULT
 - 3 // PAGE FAULT
@@ -230,7 +230,7 @@ En prosess gjør oppslag i denne rekkefølgen med pages: 1, 2, 3, 4, 1, 2, 5, 1,
 - 5 // Allerede i page frame
 
 2)
-- LRU og 3 page frames: 10 PAGE FAULTS
+- LRU (Least recently used) og 3 page frames: 10 PAGE FAULTS
 - 1 // PAGE FAULT
 - 2 // PAGE FAULT
 - 3 // PAGE FAULT
@@ -245,7 +245,7 @@ En prosess gjør oppslag i denne rekkefølgen med pages: 1, 2, 3, 4, 1, 2, 5, 1,
 - 5 // PAGE FAULT - Kaster ut 2
 
 3)
-- optimal og 3 page frames: 7 PAGE FAULTS
+- optimal (se inn i fremtiden) og 3 page frames: 7 PAGE FAULTS
 - 1 // PAGE FAULT
 - 2 // PAGE FAULT
 - 3 // PAGE FAULT
@@ -260,7 +260,7 @@ En prosess gjør oppslag i denne rekkefølgen med pages: 1, 2, 3, 4, 1, 2, 5, 1,
 - 5 // Allerede i page frame
   
 4)
-- FIFO og 4 page frames: 10 PAGE FAULTS
+- FIFO (First in First Out) og 4 page frames: 10 PAGE FAULTS
 - 1 // PAGE FAULT
 - 2 // PAGE FAULT
 - 3 // PAGE FAULT
