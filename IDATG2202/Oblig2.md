@@ -274,7 +274,7 @@ En prosess gjør oppslag i denne rekkefølgen med pages: 1, 2, 3, 4, 1, 2, 5, 1,
 - 4 // PAGE FAULT - Kaster ut 5
 - 5 // PAGE FAULT - Kaster ut 1
 
-Kalles Belady's Anomaly
+Kalles Belady's Anomaly - flere pages gir flere faults. (FIFO)
 
 
 ## Oppgave 9
