@@ -280,6 +280,9 @@ Kalles Belady's Anomaly - flere pages gir flere faults. (FIFO)
 ## Oppgave 9
 ### Kapittel 6, Oppgave 14
 1) 0.99 * 100 + 0.01 * 200 = 99 + 2 = 101 ns fordi den må kjøre ett ekstra minne oppslag.
-2) 10^-6 * 10 ms = 10^-6 * 10 000 000 ns = 10ns -> Nytt gjennomsnitt = 101ns + 10ns = 111ns
+2) (990000 * 100ns + 1 * 10000200ns + 9999 * 200ns) / 1000000 = 111ns
+   990000 = TLB hits = 100ns
+   1 major page fault = 10000200ns
+   9999 light faults = 200ns 
 3) 10 ms = 10 000 000 ns (10 000 000ns / 1ns = 10 000 000 oppslag) -> Man kan høyst ha omtrent en major page fault per 10 millioner oppslag.
 4) Fordi en major page fault koster ca 100 000 ganger mer enn et vanlig minneoppslag, så skal det svært få faults til før de tar mesteparten av kjøretiden. Når maskinen swapper skjer page faults ofte, og prosessoren bruker nesten all tiden på å vente på disk. Derfor føles det ut som om maskinen har stoppet opp helt.
