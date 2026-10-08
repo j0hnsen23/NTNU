@@ -207,7 +207,7 @@ En int: 4 byte
 1) 4096 / 4 = 1024 int-er
 2) 3000 / 1024 = 2.929 ≈ 3 pager
 3) 3000-3 = 2997 , hit rate = 2997/3000 * 100 = 99.9% (En miss hver gang en ny page brukes og resten av oppslagene blir hits(Arrayen dekker 3 pager og får dermed kun 3 misser)).
-4) TLB-en lagrer en oversettelse per page, ikke per element. Etter første oppslag ligger oversettelsen i TLB-en, så resten av elementene i samme page blir hits. Siden programmene ligger etter hverandre så bruker man romslig lokalitet.
+4) TLB-en lagrer en oversettelse per page, ikke per element. Etter første oppslag ligger oversettelsen i TLB-en, så resten av elementene i samme page blir hits. Siden programmene ligger etter hverandre så bruker man romslig (Spatial - ligger etter hverandre) lokalitet.
 
 
 ## Oppgave 8
