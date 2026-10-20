@@ -1,4 +1,4 @@
-<img width="721" height="46" alt="image" src="https://github.com/user-attachments/assets/1f6ecb2f-e08f-4f89-8939-10a15dfbb62a" /><img width="583" height="717" alt="image" src="https://github.com/user-attachments/assets/2073e279-d5b0-4dae-8e64-fcd8533d9c00" />## Oppgave 1
+## Oppgave 1
 ### Kapittel 7, Oppgave 9
 
 ```assembly
