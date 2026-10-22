@@ -323,7 +323,171 @@ int main(void) {
 ---
 
 ## Oppgave 8
-### Kapittel 7, Oppgave 12
+### Kapittel 7, Oppgave 
+a) Gjør homework oppgave 1,2,3,6
+1. 
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
+#include "common_threads.h"
+
+sem_t s;
+
+void *child(void *arg) {
+    sleep(1);
+    printf("child\n");
+    sem_post(&s);
+    return NULL;
+}
+
+int main(int argc, char *argv[]) {
+    pthread_t p;
+    printf("parent: begin\n");
+    sem_init(&s,0,0);
+    Pthread_create(&p, NULL, child, NULL);
+    sem_wait(&s);
+    printf("parent: end\n");
+    return 0;
+}
+```
+<img width="321" height="114" alt="image" src="https://github.com/user-attachments/assets/0fbfcec9-9095-47d4-b949-a7b31a9431e7" />
+
+2. 
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include "common_threads.h"
+
+// If done correctly, each child should print their "before" message
+// before either prints their "after" message. Test by adding sleep(1)
+// calls in various locations.
+
+sem_t s1, s2;
+
+void *child_1(void *arg) {
+    sleep(1);
+    printf("child 1: before\n");
+    sem_post(&s1);
+    sem_wait(&s2);
+    printf("child 1: after\n");
+    return NULL;
+}
+
+void *child_2(void *arg) {
+    printf("child 2: before\n");
+    sem_post(&s2);
+    sem_wait(&s1);
+    printf("child 2: after\n");
+    return NULL;
+}
+
+int main(int argc, char *argv[]) {
+    pthread_t p1, p2;
+    printf("parent: begin\n");
+    sem_init(&s1,0,0);
+    sem_init(&s2,0,0);
+    Pthread_create(&p1, NULL, child_1, NULL);
+    Pthread_create(&p2, NULL, child_2, NULL);
+    Pthread_join(p1, NULL);
+    Pthread_join(p2, NULL);
+    printf("parent: end\n");
+    return 0;
+}
+```
+
+3.
+```c
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#include "common_threads.h"
+
+// If done correctly, each child should print their "before" message
+// before either prints their "after" message. Test by adding sleep(1)
+// calls in various locations.
+
+// You likely need two semaphores to do this correctly, and some
+// other integers to track things.
+
+typedef struct __barrier_t {
+    sem_t mutex;
+    sem_t barrier;
+    int count;
+    int num_threads;
+} barrier_t;
+
+
+// the single barrier we are using for this program
+barrier_t b;
+
+void barrier_init(barrier_t *b, int num_threads) {
+    Sem_init(&b->mutex, 1);
+    Sem_init(&b->barrier,0);
+    count = 0;
+    b->num_threads = num_threads;
+}
+
+void barrier(barrier_t *b) {
+    Sem_wait(&b->mutex);
+    b->count++;
+    if(b->count == b->num_threads)
+        for(int i = 0; i < b->num_threads; i++)
+                Sem_post(&b->barrier);
+   Sem_wait(&b->mutex);
+   Sem_wait(&b->barrier);
+
+}
+
+//
+// XXX: don't change below here (just run it!)
+//
+typedef struct __tinfo_t {
+    int thread_id;
+} tinfo_t;
+
+void *child(void *arg) {
+    tinfo_t *t = (tinfo_t *) arg;
+    printf("child %d: before\n", t->thread_id);
+    barrier(&b);
+    printf("child %d: after\n", t->thread_id);
+    return NULL;
+}
+
+
+// run with a single argument indicating the number of
+// threads you wish to create (1 or more)
+int main(int argc, char *argv[]) {
+    assert(argc == 2);
+    int num_threads = atoi(argv[1]);
+    assert(num_threads > 0);
+
+    pthread_t p[num_threads];
+    tinfo_t t[num_threads];
+
+    printf("parent: begin\n");
+    barrier_init(&b, num_threads);
+
+    int i;
+    for (i = 0; i < num_threads; i++) {
+        t[i].thread_id = i;
+        Pthread_create(&p[i], NULL, child, &t[i]);
+    }
+
+    for (i = 0; i < num_threads; i++)
+        Pthread_join(p[i], NULL);
+
+    printf("parent: end\n");
+    return 0;
+}
+```
+6. 
+```c
+
+```
+
 b) Start med fila reader-writer.c, som er en kombinert versjon av reader-writer.c og rwlock.c, der readerne og writerne har fått nummer. Kompiler og kjør den med én writer og to readers i ti runder:
 ./reader-writer 2 1 10
 <img width="1239" height="721" alt="image" src="https://github.com/user-attachments/assets/7ad6f105-a38d-4954-81b7-fb34a0a82f41" />
