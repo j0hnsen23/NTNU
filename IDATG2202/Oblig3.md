@@ -51,11 +51,12 @@ movl    %eax, teller     # skriv den tilbake
 - Sirkulær venting (circular wait): T1 venter på T2, som venter på T1. Dette oppstår fordi trådene tar låsene i motsatt rekkefølge.
   
 3) Skriv om reglene for hvordan trådene tar låsene, slik at deadlock ikke kan skje. Virker løsningen også hvis det kommer en tredje tråd som flytter penger mellom B og en konto C?
-- Gi kontoene en fast rekkefølge (A<B<C) og la alle tråder alltid låse den laveste først. Da tar både T1 og T2 A før B, og det kan ikke oppstå sirkulær venting. Det virker også med en tredje tråd mellom B og C, fordi alle følger samme rekkefølge.
+- Problemet er at tråd 1 holder lås A og venter på B, mens tråd 2 holder lås B og venter på A. De venter på hverandre, og ingen kommer videre.
+- Regelen er at alle tråder tar låsene i fast rekkefølge, alltid kontoen med lavest nummer først. Da kan en tråd bare vente på en lås som kommer senere i rekkefølgen, så det kan aldri oppstå en ring der trådene venter på hverandre.
+- Den tredje tråden følger samme regel og tar B før C. Løsningen virker fortsatt, fordi rekkefølgen A, B, C gjelder for alle tråder, uansett hvor mange det er.
   
 4) En kollega foreslår å løse det ved å la hver tråd vente et tilfeldig antall millisekunder og prøve på nytt hvis den ikke får begge låsene. Hvorfor er nummerering en bedre løsning?
--Tilfeldig venting fjerner ikke årsaken, den bare prøver igjen. Trådene kan fortsatt kollidere gang på gang, det sløser tid, og det gir ingen garanti. Nummerering gjør deadlock umulig fra start, er enkel og har ingen ekstra ventetid.
-
+- Nummererering er bedre fordi den fjerner årsaken til deadlock. Når trådene tar låsene i samme rekkefølge, oppstår det ikke en ring der trådene venter på hverandre. Tilfeldig venting fjerner ikke årsaken, den gjør problemet mindre sannsynlig. Trådene kan fortsatt kollidere uten å komme videre og kan fortsatt kaste bort tid på å slippe låsene og vente.
 ---
 ## Oppgave 3 
 ### Kapittel 7, Oppgave 12
@@ -144,7 +145,7 @@ int main(int argc, char *argv[]) {
 - Helgrind rapporterer 0 feil. Begge tilgangene til balance er beskyttet av samme mutex, så bare én tråd kan endre den om gangen.
 ---
 #### Homework 3
-Problemet er at de to trådene tar de samme to låsene i motsatt rekkefølge: den ene låser m1 og så m2, mens den andre låser m2 og så m1. Hvis tråd 1 får m1 og tråd 2 får m2 samtidig, venter tråd 1 på m2 og tråd 2 på m1. Ingen av dem slipper låsen sin, så begge venter for alltid. Dette er deadlock på grunn av sirkulær venting, og det skjer bare hvis trådene flettes på akkurat denne måten.
+- Problemet er at de to trådene tar de samme to låsene i motsatt rekkefølge: den ene låser m1 og så m2, mens den andre låser m2 og så m1. Hvis tråd 1 får m1 og tråd 2 får m2 samtidig, venter tråd 1 på m2 og tråd 2 på m1. Ingen av dem slipper låsen sin, så begge venter for alltid. Dette er deadlock på grunn av sirkulær venting, og det skjer bare hvis trådene flettes på akkurat denne måten.
 ---
 #### Homework 4
 <img width="474" height="507" alt="image" src="https://github.com/user-attachments/assets/713c6f7c-6ea2-4d94-a61f-ba6d9308890e" />
