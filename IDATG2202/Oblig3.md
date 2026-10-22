@@ -62,9 +62,9 @@ movl    %eax, teller     # skriv den tilbake
 ### Kapittel 7, Oppgave 12
 #### Homework 1
 <img width="667" height="523" alt="Valgrind" src="https://github.com/user-attachments/assets/21428ab3-4c7b-4f43-9cff-d5b5a6524e8f"/>
-- Data race: Både worker (linje 8) og main (linje 15) gjør balance++ uten lås, så trådene kan overskrive hverandres oppdateringer.
-- Riktige linjer? Ja, helgrind peker på linje 8 og 15, der balance endres.
-- Annen informasjon: Hvilke tråder som er involvert (#1 og #2) og hvor tråd #2 ble opprettet (linje 14), at det gjelder både lesing og skriving av 4 bytes, at variabelen heter balance, og at ingen låser var holdt («Locks held: none»).
+- I main-race.c øker både hovedtråden og worker-tråden variabelen balance med balance++ uten lås. Det er en data race, fordi begge trådene kan bruke variabelen samtidig og da kan en av økningene bli overskrevet.
+- I rapporten fra Helgrind så finner den racet og peker på linje 15 i main og linje 8 i worker.
+- Helgrind forteller også hvilke tråder som krasjer med hverandre, hvor tråd #2 ble laget (linje 14), at ingen av trådene brukte lås og at det er variabelen balance det gjelder. Den finner også to feil fordi balance++ gjør to ting: den leser verdien og skriver en ny. Begge delene skjer uten lås, så begge blir meldt som feil.  
 
 #### Homework 2
 1. Fjerne en linje: Kommenterer ut balance++
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 ```
-- Helgrind rapporterer fortsatt data race. Den ene tråden har «Locks held: 1» og den andre «Locks held: none». En lås hjelper bare hvis alle tråder bruker den.
+- Helgrind rapporterer fortsatt data race. Den ene tråden har «Locks held: 1» og den andre «Locks held: none». Den andre tråden bruker ikke låsen og kan derfor endre balance samtidig. En lås hjelper bare hvis alle tråder bruker den.
 
 3. Låse rundt begge oppdateringer
 ```c
@@ -145,11 +145,42 @@ int main(int argc, char *argv[]) {
 - Helgrind rapporterer 0 feil. Begge tilgangene til balance er beskyttet av samme mutex, så bare én tråd kan endre den om gangen.
 ---
 #### Homework 3
-- Problemet er at de to trådene tar de samme to låsene i motsatt rekkefølge: den ene låser m1 og så m2, mens den andre låser m2 og så m1. Hvis tråd 1 får m1 og tråd 2 får m2 samtidig, venter tråd 1 på m2 og tråd 2 på m1. Ingen av dem slipper låsen sin, så begge venter for alltid. Dette er deadlock på grunn av sirkulær venting, og det skjer bare hvis trådene flettes på akkurat denne måten.
+```c
+#include <stdio.h>
+
+#include "common_threads.h"
+
+pthread_mutex_t m1 = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t m2 = PTHREAD_MUTEX_INITIALIZER;
+
+void* worker(void* arg) {
+    if ((long long) arg == 0) {
+        Pthread_mutex_lock(&m1);
+        Pthread_mutex_lock(&m2);
+    } else {
+        Pthread_mutex_lock(&m2);
+        Pthread_mutex_lock(&m1);
+    }
+    Pthread_mutex_unlock(&m1);
+    Pthread_mutex_unlock(&m2);
+    return NULL;
+}
+
+int main(int argc, char *argv[]) {
+    pthread_t p1, p2;
+    Pthread_create(&p1, NULL, worker, (void *) (long long) 0);
+    Pthread_create(&p2, NULL, worker, (void *) (long long) 1);
+    Pthread_join(p1, NULL);
+    Pthread_join(p2, NULL);
+    return 0;
+}
+```
+
+- De to trådene tar de samme to låsene i motsatt rekkefølge. Tråd 1 tar m1 også m2, mens tråd 2 tar m2, også m1. Hvis tråd 1 tar m1 og tråd 2 tar m2 samtidig, venter begge på hverandre og den låsen som den andre holder og ingen kommer seg videre. Det blir en deadlock, men den skjer ikke hver gang bare når trådene bytter på akkurat feil tidspunkt. 
 ---
 #### Homework 4
 <img width="474" height="507" alt="image" src="https://github.com/user-attachments/assets/713c6f7c-6ea2-4d94-a61f-ba6d9308890e" />
-- Helgrind rapporterer et lock order violation: m1 og m2 tas i motsatt rekkefølge av de to trådene, og den viser hvilke linjer det skjer på. Den advarer selv om programmet ikke hang i akkurat den kjøringen.
+- Helgrind rapporterer en feil ''lock order violated''. Den viser at den første tråden tok låsene i rekkefølgen m1 og så m2, mens tråd #3 tok dem i motsatt rekkefølge m2 og så m1. Helgrind finner feilen selv om programmet ikke hang, fordi den ser at låsene tas i bruk i ulik rekkefølge og at deadlock kan oppstå.
 
 ---
 
@@ -161,7 +192,7 @@ int main(int argc, char *argv[]) {
 - Threadcount:
 - <img width="643" height="384" alt="image" src="https://github.com/user-attachments/assets/ddce0022-602f-4042-b6fc-9437753fac34" />
 
-- I forkcount har hver prosess sin egen kopi av g_ant, så begge teller til 30 hver for seg. I threadcount deler trådene samme g_ant, så de teller til 30 sammen, og fordi det ikke er noen lås, kan det oppstå race conditions.
+- I forkcount har hver prosess sin egen kopi av g_ant, så begge teller til 30 hver for seg. I threadcount deler trådene samme g_ant, så de teller til 30 sammen, og fordi det ikke er noen lås, kan det oppstå race conditions, der begge trådene leser samme verdi samtidig, slik at et tall telles to ganger eller en økning forsvinner.
 
 ---
 
@@ -195,20 +226,20 @@ int main(void) {
 - Verdien som X må være for å få den utskriften er 0.
   
 2) Gå gjennom de to mulige rekkefølgene med den verdien: én der child-tråden rekker å kjøre først, og én der parent kommer til sem_wait() først. Hva er verdien til semaforen underveis?
-- Child kjører først: Semaforen starter på 0. Parent skriver «parent: begin» og lager child. Child kjører, skriver «child» og gjør sem_post, så semaforen blir 1. Parent kommer til sem_wait, trekker 1 (semaforen blir 0) og fortsetter uten å vente. Parent skriver «parent: end».
-- Parent kommer til sem_wait() først: Semaforen starter på 0. Parent skriver «parent: begin», lager child og kommer til sem_wait. Semaforen blir −1, og parent sover. Child skriver «child» og gjør sem_post. Semaforen blir 0, og parent vekkes. Parent skriver «parent: end».
+- Child kjører først: Semaforen starter på 0. Parent skriver "parent: begin" og lager child. Child skriver "child" og gjør sem_post, så semaforen blir 1. Parent kommer til sem_wait, semaforen blir 0 og parent fortsetter uten å vente. Parent skriver "parent: end".
+- Parent kommer til sem_wait først: Semaforen starter på 0. Parent skriver "parent: begin", lager child og kommer til sem_wait. Semaforen blir -1 og parent sover. Child skriver "child" og gjør sem_post. Semaforen blir 0 og parent vekkes og skriver "parent: end".
   
 3) Hva skjer hvis X settes til 1?
-- Med x=1 starter semaforen på 1, så sem_wait i parent går rett gjennom å vente. Parent er da ikke lenger avhengig av at child har kjørt. Eller til og med at programmet avslutter før child rekker å skrive «child» i det hele tatt. Rekkefølgen er altså ikke garantert. Hvis child likevel rekker å kjøre før sem_wait, blir semaforen 2 etter sem_post, og 1 etter sem_wait.
+- Med X = 1 starter semaforen på 1, så sem_wait i parent går rett gjennom uten å vente. Da venter ikke parent på child, så «child» kan bli skrevet før eller etter «parent: end», eller ikke i det hele tatt hvis programmet avslutter først. Rekkefølgen er altså ikke garantert.
   
 4) Hvorfor kan vi ikke bruke en mutex i stedet for semaforen her?
--En semafor kan brukes til å vente på at en annen tråd gir beskjed. En mutex kan bare låses og låses opp av samme tråd, så den egner seg ikke til dette.
+- En semafor kan brukes til å vente på at en annen tråd gir beskjed. En mutex må låses opp av samme tråd som låste den, så parent kan ikke låse den og så la child låse den opp. Derfor passer den ikke til å vente på en annen tråd.
 
 
 ---
 
 ## Oppgave 6
-### Kapittel 7, Oppgave 11
+### Kapittel 8, Oppgave 11
 ```c
 #include <stdio.h>
 #include <stdlib.h>
@@ -245,11 +276,12 @@ Forklar hvordan programmet virker, og hvorfor det sannsynligvis ikke skriver ut 
 - 8
 - 9
 - 10
-- Programmet har en global variabel g_ant så alle tråder deler den samme kopien.
-- I main startes en ny tråd med pthread_create, og den tråden kjører writeloop. Rett etterpå kaller main selv writeloop(NULL). Dermed kjører to tråder den samme løkka samtidig, og begge jobber på den samme g_ant.
-- Hver tråd: Sjekker om g_ant < 10, øker g_ant med 1, sover et tilfeldig antall mikrosekunder 0-9, skriver ut verdien av g_ant slik den er akkurat da.
 
-- Grunnen til at det ikke skriver ut 1-10 er fordi utskriften skjer etter søvnen og ikke rette etter økning.Mens en tråd sover kan en annen rekke å øke antallet og deretter skrives en annen verdi ut.
+- To tråder (den nye tråden og main) kjører writeloop samtidig og deler samme g_ant.
+- Hver tråd øker g_ant, sover litt og skriver så ut verdien.
+- Mens en tråd sover kan den andre øke g_ant, så verdien kan ha endret seg før utskriften skjer. Derfor kan tall hoppes over eller skrives ut to ganger.
+- Siden det er ikke er noen lås her så kan begge trådene se 9 samtidig og øke slik at g_ant blir 11.
+- exit(0) avslutter hele programmet når den første tråden er ferdig, så den andre tråden kan bli stoppet før den skriver ut sitt siste tall.
 
 
 Kompiler og kjør programmet. Legg til en låsemekanisme du selv velger, slik at det bare skriver ut tallene fra én til ti i rekkefølge, som vist over. Begrunn valgene dine.
@@ -281,7 +313,12 @@ int main(void) {
     return 0;
 }
 ```
-- g_ant er en delt ressurs, og uten synkronisering oppstår en race condition. Kritisk seksjoner sjekken, økningen og utskriften fordi trådene kan bli preemptet midt i, spesielt under usleep. Låsen er plassert før while, slik at hele løkka blir en kritisk seksjon med mutual exclusion. Den første tråden som får mutexen, utfører alle iterasjonene atomisk sett utenfra og terminerer prosessen med exit mens den fortsatt holder låsen. Den andre tråden blir blokkert.Å låse inne i løkka med unlock utenfor ville gitt vranglås (deadlock), fordi tråden prøver å ta en lås den allerede holder. Ulempen er at løsningen serialiserer arbeidet og fjerner parallelliteten.
+- g_ant deles av begge trådene, så uten lås oppstår det race conditions.
+- Den kritiske seksjonen er sjekken, økningen og utskriften, fordi en tråd kan bli avbrutt midt i, særlig under usleep.
+- Bruker en mutex og låser før while-løkka slik at hele løkka blir en kritisk seksjon. Den første tråden som får låsen teller fra 1 til 10 alene.
+- Når den er ferdig, avslutter exit(0) hele programmet, så den andre tråden skriver aldri ut noe.
+- Å låse inne i løkka og låse opp utenfor ville gitt deadlock, fordi tråden prøver å ta en lås den allerede holder.
+- Ulempen er at trådene ikke lenger jobber samtidig, så vi mister parallelliteten.
 
 ---
 
@@ -313,9 +350,8 @@ d) Endre koden slik at nye readers ikke slipper til å lese hvis en writer vil s
 #define MAX_MOD_WRITE 100
 
 typedef struct _rwlock_t {
-  sem_t writelock; 
+  sem_t writelock;
   sem_t lock;
-  sem_t turnstille; // 1
   int readers;
 } rwlock_t;
 
@@ -323,12 +359,9 @@ void rwlock_init(rwlock_t *lock) {
   lock->readers = 0;
   Sem_init(&lock->lock, 1);
   Sem_init(&lock->writelock, 1);
-  Sem_init(&lock->turnstille,1); // 2
 }
 
 void rwlock_acquire_readlock(rwlock_t *lock) {
-  Sem_wait(&lock->turnstille); // 3
-  Sem_wait(&lock->turnstille); // 4
   Sem_wait(&lock->lock);
   lock->readers++;
   if (lock->readers == 1) Sem_wait(&lock->writelock);
@@ -342,15 +375,9 @@ void rwlock_release_readlock(rwlock_t *lock) {
   Sem_post(&lock->lock);
 }
 
-void rwlock_acquire_writelock(rwlock_t *lock) {
-  Sem_wait(&lock->writelock);
-  Sem_wait(&lock->turnstille); // 5
-}
-  
-void rwlock_release_writelock(rwlock_t *lock) {
-Sem_post(&lock->writelock);
-Sem_post(&lock->turnstille); // 6
-}
+void rwlock_acquire_writelock(rwlock_t *lock) { Sem_wait(&lock->writelock); }
+
+void rwlock_release_writelock(rwlock_t *lock) { Sem_post(&lock->writelock); }
 
 int loops;
 int value = 0;
